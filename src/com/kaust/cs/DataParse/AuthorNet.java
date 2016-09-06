@@ -93,9 +93,50 @@ public class AuthorNet {
         return list;
     }
 
+    class AuthorRelationPairs{
+        public String author1;
+        public String author2;
+        public ArrayList<String> COPaperIDList;
+        public long ownerShip;
+
+        public String getAuthor1() {
+            return author1;
+        }
+
+        public void setAuthor1(String author1) {
+            this.author1 = author1;
+        }
+
+        public String getAuthor2() {
+            return author2;
+        }
+
+        public void setAuthor2(String author2) {
+            this.author2 = author2;
+        }
+
+        public ArrayList<String> getCOPaperID() {
+            return COPaperIDList;
+        }
+
+        public void setCOPaperIDList(ArrayList<String> COPaperIDList) {
+            this.COPaperIDList = COPaperIDList;
+        }
+
+        public long getOwnerShip() {
+            return ownerShip;
+        }
+
+        public void setOwnerShip(long ownerShip) {
+            this.ownerShip = ownerShip;
+        }
+    }
+
     public void findCooperationBetAuthor(){
         //findCooperationBetAuthor(String fileName)
         authorInfoAnalysis();
+        HashMap<Integer, AuthorRelationPairs> relMap = new HashMap<Integer,AuthorRelationPairs>();
+        int numOfRel = 0;
         for(String key0: author.keySet()){
             ArrayList<String> pid0 = author.get(key0);
             for(String key1: author.keySet()){
@@ -103,43 +144,82 @@ public class AuthorNet {
                 if(key0.equals(key1)){
                     continue;
                 }else{
-                    //System.out.println(key0+"==>"+pid0+"  "+key1+"==>"+pid1);
-
-                        ArrayList<String> arr = intersect(pid0,pid1);
-                        if(!vertices.contains(key0)){
-                            vertices.add(key0);
-                        }
-                        if(!vertices.contains(key1)){
-                            vertices.add(key1);
-                        }
+                    ArrayList<String> arr = intersect(pid0,pid1);
                         if(arr.size()>0){
-                            edgeNum++;
-                            Weight w = new Weight(vertices.indexOf(key0),vertices.indexOf(key1),arr.size());
-                            weights.add(w);
-                            //write the inofrmation into a files
-//                            try {
-//                                File file=new File(fileName);
-//                                if(!file.exists()||file.isDirectory()) throw new FileNotFoundException();
-//                                FileOutputStream out = new FileOutputStream(file,true);
-//                                StringBuffer sb = new StringBuffer();
-//                                sb.append(key0+" "+key1+" "+arr.size());
-//                                for(int i=0; i<arr.size(); i++){
-//                                    sb.append(" #"+arr.get(i));
-//                                }
-//                                sb.append("\n");
-//                                out.write(sb.toString().getBytes("utf-8"));
-//                                out.close();
-////                                System.out.println("author["+key0+"] and author["+ key1+ "] cooperate "+ arr.size()+" papers, including"+arr);
-//                            }catch (Exception e){
-//                                System.out.println("Data writing Errors:"+e.toString());
-//                            }
+                            AuthorRelationPairs authorsRel = new AuthorRelationPairs();
+                            authorsRel.setAuthor1(key0);
+                            authorsRel.setAuthor2(key1);
+                            authorsRel.setCOPaperIDList(arr);
+                            authorsRel.setOwnerShip(0);
+                            numOfRel++;
+                            relMap.put(numOfRel,authorsRel);
+                        }
+                    }
+
+                }
+            }
+        //generate flag for every pair
+        for(int key0: relMap.keySet()){
+            for(int key1: relMap.keySet()){
+                if(key0 != key1){
+                    AuthorRelationPairs a0 = relMap.get(key0);
+                    AuthorRelationPairs a1 = relMap.get(key1);
+                    if(a0.getAuthor1().equals(a1.getAuthor1()) || a0.getAuthor1().equals(a1.getAuthor2()) || a0.getAuthor2().equals(a1.getAuthor1()) || a0.getAuthor2().equals(a1.getAuthor2())){
+                        if(a0.getOwnerShip() == 0 && a1.getOwnerShip() == 0) {
+                            a0.setOwnerShip(key0);
+                            a1.setOwnerShip(key0);
+                        }else if(a0.getOwnerShip() == 0 && a1.getOwnerShip() != 0){
+                            a0.setOwnerShip(a1.getOwnerShip());
+                        }else if(a0.getOwnerShip() != 0 && a1.getOwnerShip() == 0){
+                            a1.setOwnerShip(a0.getOwnerShip());
                         }
                     }
                 }
             }
         }
+        // scan the map to cluster
+        HashMap<Long, ArrayList<AuthorRelationPairs>> authorRelMap = new HashMap<Long, ArrayList<AuthorRelationPairs>>();
+        for(int key0: relMap.keySet()){
+            AuthorRelationPairs a0 = relMap.get(key0);
+            long flag0 = a0.getOwnerShip();
+            for(int key1: relMap.keySet()){
+                AuthorRelationPairs a1 = relMap.get(key0);
+                long flag1 = a1.getOwnerShip();
+                if(key0 != key1){
+                    if(flag0 == flag1){
+                        if(!authorRelMap.containsKey(flag0)){
+                        ArrayList<AuthorRelationPairs> simAuthors = new ArrayList<AuthorRelationPairs>();
+                        simAuthors.add(a0);
+                        simAuthors.add(a1);
+                        authorRelMap.put(flag0, simAuthors);
+                        }else{
+                            if(authorRelMap.get(flag0).contains(a1)){
+                                authorRelMap.get(flag0).add(a0);
+                            }else if(authorRelMap.get(flag0).contains(a0)){
+                                authorRelMap.get(flag0).add(a1);
+                            }else if(!authorRelMap.get(flag0).contains(a1) && authorRelMap.get(flag0).contains(a0)){
+                                authorRelMap.get(flag0).add(a0);
+                                authorRelMap.get(flag0).add(a1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public void createAuthorNet(){
+//        if(!vertices.contains(key0)){
+//            vertices.add(key0);
+//        }
+//        if(!vertices.contains(key1)){
+//            vertices.add(key1);
+//        }
+//        if(arr.size()>0) {
+//            edgeNum++;
+//            Weight w = new Weight(vertices.indexOf(key0), vertices.indexOf(key1), arr.size());
+//            weights.add(w);
+//        }
         findCooperationBetAuthor();
         int vecs = vertices.size();
         int edegs = edgeNum;
@@ -167,7 +247,7 @@ public class AuthorNet {
     public static void main(String[] args){
         AuthorNet an = new AuthorNet();
         an.createAuthorNet();
-        Vector<Paper> vec = new Vector<Paper>();
-        //an.findCooperationBetAuthor(outPutPath);
+//        Vector<Paper> vec = new Vector<Paper>();
+//        an.findCooperationBetAuthor(outPutPath);
     }
 }
