@@ -116,7 +116,7 @@ public class AuthorNet {
                             edgeNum++;
                             Weight w = new Weight(vertices.indexOf(key0),vertices.indexOf(key1),arr.size());
                             weights.add(w);
-                            //write the inofrmation into a file
+                            //write the inofrmation into a files
 //                            try {
 //                                File file=new File(fileName);
 //                                if(!file.exists()||file.isDirectory()) throw new FileNotFoundException();
