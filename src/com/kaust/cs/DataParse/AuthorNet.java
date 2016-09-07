@@ -5,6 +5,7 @@ import com.kaust.cs.PaperPOJO.Paper;
 import java.util.Map;
 import java.util.Map.Entry;
 import com.kaust.cs.Tools.GraphModel;
+import com.kaust.cs.Tools.TimeCost;
 import com.kaust.cs.Tools.Weight;
 
 /**
@@ -16,9 +17,7 @@ public class AuthorNet {
     String outPutPath = "./Data/authorResults.txt";
     Vector<Paper> v = new DataImport().dataImport(file);
     HashMap<String, ArrayList<String>> author = new HashMap<String, ArrayList<String>>();
-    public ArrayList<String> vertices = new ArrayList<String>();
-    public ArrayList<Weight> weights = new ArrayList<Weight>();
-    public int edgeNum = 0;
+
     //find authors who are always cooperating
     public void authorInfoAnalysis(){
         Enumeration enums = v.elements();
@@ -57,6 +56,7 @@ public class AuthorNet {
 //
 //                System.out.println(key);
 //        }
+        System.out.println("The total number of authors is "+ author.size());
     }
 
     public HashMap<String, ArrayList<String>> findFrequentAuthors(){
@@ -96,7 +96,7 @@ public class AuthorNet {
     class AuthorRelationPairs{
         public String author1;
         public String author2;
-        public ArrayList<String> COPaperIDList;
+        public ArrayList<String> coPaperIDList;
         public long ownerShip;
 
         public String getAuthor1() {
@@ -115,12 +115,12 @@ public class AuthorNet {
             this.author2 = author2;
         }
 
-        public ArrayList<String> getCOPaperID() {
-            return COPaperIDList;
+        public ArrayList<String> getCoPaperIDList() {
+            return coPaperIDList;
         }
 
-        public void setCOPaperIDList(ArrayList<String> COPaperIDList) {
-            this.COPaperIDList = COPaperIDList;
+        public void setcoPaperIDList(ArrayList<String> coPaperIDList) {
+            this.coPaperIDList = coPaperIDList;
         }
 
         public long getOwnerShip() {
@@ -132,7 +132,7 @@ public class AuthorNet {
         }
     }
 
-    public void findCooperationBetAuthor(){
+    public HashMap<Long, ArrayList<AuthorRelationPairs>> findCooperationBetAuthor(){
         //findCooperationBetAuthor(String fileName)
         authorInfoAnalysis();
         HashMap<Integer, AuthorRelationPairs> relMap = new HashMap<Integer,AuthorRelationPairs>();
@@ -149,7 +149,7 @@ public class AuthorNet {
                             AuthorRelationPairs authorsRel = new AuthorRelationPairs();
                             authorsRel.setAuthor1(key0);
                             authorsRel.setAuthor2(key1);
-                            authorsRel.setCOPaperIDList(arr);
+                            authorsRel.setcoPaperIDList(arr);
                             authorsRel.setOwnerShip(0);
                             numOfRel++;
                             relMap.put(numOfRel,authorsRel);
@@ -183,7 +183,7 @@ public class AuthorNet {
             AuthorRelationPairs a0 = relMap.get(key0);
             long flag0 = a0.getOwnerShip();
             for(int key1: relMap.keySet()){
-                AuthorRelationPairs a1 = relMap.get(key0);
+                AuthorRelationPairs a1 = relMap.get(key1);
                 long flag1 = a1.getOwnerShip();
                 if(key0 != key1){
                     if(flag0 == flag1){
@@ -206,35 +206,52 @@ public class AuthorNet {
                 }
             }
         }
+        return authorRelMap;
     }
 
     public void createAuthorNet(){
-//        if(!vertices.contains(key0)){
-//            vertices.add(key0);
-//        }
-//        if(!vertices.contains(key1)){
-//            vertices.add(key1);
-//        }
-//        if(arr.size()>0) {
-//            edgeNum++;
-//            Weight w = new Weight(vertices.indexOf(key0), vertices.indexOf(key1), arr.size());
-//            weights.add(w);
-//        }
-        findCooperationBetAuthor();
-        int vecs = vertices.size();
-        int edegs = edgeNum;
-        GraphModel g = new GraphModel(vecs);
-        String[] vertice = (String[]) vertices.toArray(new String [vertices.size()]);
-        Weight[] weight = (Weight[]) weights.toArray(new Weight [weights.size()]);
-        try {
-            buildAdjGraphic(g, vertice,vecs,weight,edegs);
-        }catch (Exception e){
-            System.out.println("Builing AuthorNet ERRORS"+e.toString());
+        HashMap<Long, ArrayList<AuthorRelationPairs>> tempClusters = findCooperationBetAuthor();
+        HashMap<Long, GraphModel> clusters = new HashMap<Long, GraphModel>();
+        for(long id: tempClusters.keySet()){
+            ArrayList<AuthorRelationPairs> arpList = tempClusters.get(id);
+            ArrayList<String> vertices = new ArrayList<String>();
+            ArrayList<Weight> weights = new ArrayList<Weight>();
+            int edgeNum = 0;
+            for(AuthorRelationPairs arp: arpList){
+                String author1 = arp.getAuthor1();
+                String author2 = arp.getAuthor2();
+                ArrayList<String> coPaperIDList = arp.getCoPaperIDList();
+                if(!vertices.contains(author1)){
+                    vertices.add(author1);
+                }
+                if(!vertices.contains(author2)){
+                    vertices.add(author2);
+                }
+                if(coPaperIDList.size()>0) {
+                    edgeNum++;
+                    Weight w = new Weight(vertices.indexOf(author1), vertices.indexOf(author2), coPaperIDList.size());
+                    weights.add(w);
+                }
+            }
+            //generate author networks for every cluster
+            int vecs = vertices.size();
+            int edegs = edgeNum;
+            GraphModel g = new GraphModel(vecs);
+            String[] vertice = (String[]) vertices.toArray(new String [vertices.size()]);
+            Weight[] weight = (Weight[]) weights.toArray(new Weight [weights.size()]);
+            try {
+                buildAdjGraphic(g, vertice,vecs,weight,edegs);
+            }catch (Exception e){
+                System.out.println("Builing AuthorNet ERRORS"+e.toString());
+            }
+            if(edegs > 1) {
+                System.out.println("--------The Author Network of No.【"+id+"】is shown as following"+"---------");
+                g.print();
+            }
+            clusters.put(id, g);
         }
-//        if(edegs > 1) {
-//            System.out.println("--------该邻接矩阵如下---------");
-//            g.print();
-//        }
+        System.out.println("The size of clusters is: "+clusters.size());
+
     }
 
     /**
@@ -246,7 +263,10 @@ public class AuthorNet {
 
     public static void main(String[] args){
         AuthorNet an = new AuthorNet();
+        long startTime = TimeCost.getTime();
         an.createAuthorNet();
+        long endTime = TimeCost.getTime();
+        System.out.println("The time of builing authorNet is :"+TimeCost.getTimeCost(startTime, endTime)+" ms");
 //        Vector<Paper> vec = new Vector<Paper>();
 //        an.findCooperationBetAuthor(outPutPath);
     }
