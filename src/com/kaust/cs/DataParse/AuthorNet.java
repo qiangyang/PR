@@ -260,7 +260,6 @@ public class AuthorNet {
     public void buildAdjGraphic(GraphModel g, String[] vertices, int n,Weight[] weight,int e) throws Exception{
         Weight.createAdjGraphic(g, vertices, n, weight, e);
     }
-
     public static void main(String[] args){
         AuthorNet an = new AuthorNet();
         long startTime = TimeCost.getTime();
