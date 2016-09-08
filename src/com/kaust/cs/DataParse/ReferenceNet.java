@@ -153,7 +153,6 @@ public class ReferenceNet {
         }
         return tempCluster;
     }
-
     //create reference network
     public void createReferenceNetwork(){
         HashMap<Long, ArrayList<ReferenceRelation>> tempClusters = getConnectedReference();
