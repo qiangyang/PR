@@ -177,8 +177,24 @@ public class AuthorNet {
                 }
             }
         }
-        // scan the map to cluster
+
+        //offer a flag for the single cluster, new start------
+        long singleFlag = 0;
+
         HashMap<Long, ArrayList<AuthorRelationPairs>> authorRelMap = new HashMap<Long, ArrayList<AuthorRelationPairs>>();
+        for(int key: relMap.keySet()){
+            AuthorRelationPairs a = relMap.get(key);
+            long flag = a.getOwnerShip();
+            if(flag == 0){
+                singleFlag--;
+                ArrayList<AuthorRelationPairs> simAuthors = new ArrayList<AuthorRelationPairs>();
+                simAuthors.add(a);
+                authorRelMap.put(singleFlag, simAuthors);
+            }
+        }
+        //new end----
+
+        // scan the map to cluster
         for(int key0: relMap.keySet()){
             AuthorRelationPairs a0 = relMap.get(key0);
             long flag0 = a0.getOwnerShip();
@@ -186,13 +202,13 @@ public class AuthorNet {
                 AuthorRelationPairs a1 = relMap.get(key1);
                 long flag1 = a1.getOwnerShip();
                 if(key0 != key1){
-                    if(flag0 == flag1){
+                    if(flag0 == flag1 && flag0 != 0){
                         if(!authorRelMap.containsKey(flag0)){
                         ArrayList<AuthorRelationPairs> simAuthors = new ArrayList<AuthorRelationPairs>();
                         simAuthors.add(a0);
                         simAuthors.add(a1);
                         authorRelMap.put(flag0, simAuthors);
-                        }else{
+                        }else {
                             if(authorRelMap.get(flag0).contains(a1)){
                                 authorRelMap.get(flag0).add(a0);
                             }else if(authorRelMap.get(flag0).contains(a0)){
@@ -200,6 +216,8 @@ public class AuthorNet {
                             }else if(!authorRelMap.get(flag0).contains(a1) && authorRelMap.get(flag0).contains(a0)){
                                 authorRelMap.get(flag0).add(a0);
                                 authorRelMap.get(flag0).add(a1);
+                            }else if(authorRelMap.get(flag0).contains(a1) && authorRelMap.get(flag0).contains(a0)){
+                                continue;
                             }
                         }
                     }
