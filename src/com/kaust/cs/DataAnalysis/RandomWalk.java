@@ -14,9 +14,10 @@ import java.util.LinkedList;
 public class RandomWalk {
     public static final long MAX_ITERATIOM_TIMES = 1000;
     public static final double MIN_ERRORS = 0.0001;
+    public static final float alpha = 0.8f;
+    ReferenceNet rn = new ReferenceNet();
+    HashMap<Long, GraphModel> oringalClusters = rn.createReferenceNetwork();
     public HashMap<Long, double[][]> getTransMatrix(){
-        ReferenceNet rn = new ReferenceNet();
-        HashMap<Long, GraphModel> oringalClusters = rn.createReferenceNetwork();
         HashMap<Long, double[][]> transMatrix = new HashMap<Long, double[][]>();
         for(long id: oringalClusters.keySet()){
             GraphModel gm = oringalClusters.get(id);
@@ -43,6 +44,18 @@ public class RandomWalk {
 //            }
         }
         return transMatrix;
+    }
+    //for every node from every grahph compute their rank scores
+    public void RWRGraph(){
+        HashMap<Long, double[][]> transMatrix = getTransMatrix();
+        for(long id: transMatrix.keySet()){
+            GraphModel gm = oringalClusters.get(id);
+            ArrayList<String> vertices = gm.getValueOfVertice();
+            for(String vertice: vertices){
+                System.out.println("ID为"+id+"的referenceNet中"+"节点"+vertice+"的ranking scroe为:");
+                randomWalkRestart(alpha, Integer.parseInt(vertice),MAX_ITERATIOM_TIMES,MIN_ERRORS,transMatrix.get(id));
+            }
+        }
     }
     //RWR
     public void randomWalkRestart(float alpha, int startPoint, long maxIterationTimes, double minErrors, double transMatrix[][]){
@@ -76,8 +89,9 @@ public class RandomWalk {
                 }
             }else
                 break;
+            iterationTimes++;
         }
-        System.out.println("迭代后节点["+startPoint+"]的rank score为:");
+        System.out.println("迭代"+iterationTimes+"次后节点["+startPoint+"]的rank score为:");
         for(int i=0; i<rank_sp.length; i++){
             System.out.println(rank_sp[i]);
         }
@@ -97,7 +111,7 @@ public class RandomWalk {
     }
     public static void main(String[] args){
         RandomWalk rw = new RandomWalk();
-        rw.getTransMatrix();
+        rw.RWRGraph();
     }
 }
 
