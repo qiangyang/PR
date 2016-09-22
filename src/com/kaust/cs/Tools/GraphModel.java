@@ -71,6 +71,20 @@ public class GraphModel {
             return this.edges[v1][v2];
 
         }
+        //获取每一列的值
+        public ArrayList<Integer> getSumOfCol(){
+            ArrayList<Integer> sumList = new ArrayList<>();
+            for(int i=0; i<edges.length; i++){
+                int sum=0;
+                for(int j=0; j<edges[0].length; j++){
+                    if(edges[j][i]==1){
+                        sum+=edges[j][i];
+                    }
+                }
+                sumList.add(sum);
+            }
+            return sumList;
+        }
         //获得所有边的权值之和
         public int getWeightOfAllEdges() throws Exception
         {

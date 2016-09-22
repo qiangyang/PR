@@ -154,7 +154,7 @@ public class ReferenceNet {
         return tempCluster;
     }
     //create reference network
-    public void createReferenceNetwork(){
+    public HashMap<Long, GraphModel> createReferenceNetwork(){
         HashMap<Long, ArrayList<ReferenceRelation>> tempClusters = getConnectedReference();
         HashMap<Long, GraphModel> clusters = new HashMap<Long, GraphModel>();
         for(long id: tempClusters.keySet()){
@@ -201,6 +201,7 @@ public class ReferenceNet {
         GraphModel gm = clusters.get(id);
         System.out.println(gm.getValueOfVertice());
         System.out.println("The size of clusters is: "+clusters.size());
+        return clusters;
     }
 
     /**

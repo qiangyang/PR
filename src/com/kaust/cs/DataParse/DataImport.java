@@ -21,7 +21,7 @@ public class DataImport {
             StringBuffer tempPaper = new StringBuffer();
             int isFirstTimes = 0;
             int i = 0;
-            while((line = br.readLine()) != null && i < 2000){
+            while((line = br.readLine()) != null && i < 3000){
                 if(isFirstTimes == 0){
                     tempPaper.append(line);
                 }else{
