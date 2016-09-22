@@ -51,9 +51,9 @@ public class RandomWalk {
         for(long id: transMatrix.keySet()){
             GraphModel gm = oringalClusters.get(id);
             ArrayList<String> vertices = gm.getValueOfVertice();
-            for(String vertice: vertices){
-                System.out.println("ID为"+id+"的referenceNet中"+"节点"+vertice+"的ranking scroe为:");
-                randomWalkRestart(alpha, Integer.parseInt(vertice),MAX_ITERATIOM_TIMES,MIN_ERRORS,transMatrix.get(id));
+            for(int i=0; i<vertices.size(); i++){
+                System.out.println("ID为"+id+"的referenceNet中"+"节点"+vertices.get(i)+"的ranking scroe为:");
+                randomWalkRestart(alpha, i, MAX_ITERATIOM_TIMES, MIN_ERRORS, transMatrix.get(id));
             }
         }
     }
@@ -79,8 +79,8 @@ public class RandomWalk {
                     double[] temp = rank_sp;
                     for(int j=0; j<transMatrix[0].length; j++){
                         rank_sp[i]+= alpha*transMatrix[i][j]*rank_sp[j];
-                        rank_sp[i]+= (1-alpha)*e[i];
                     }
+                    rank_sp[i]+= (1-alpha)*e[i];
                     for(int k=0; k<rank_sp.length; k++){
                         if(judge(temp,rank_sp,minErrors)){
                             flag = false;
