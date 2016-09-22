@@ -74,18 +74,16 @@ public class RandomWalk {
         }
         boolean flag = true;
         while(iterationTimes < maxIterationTimes){
+            double[] temp = rank_sp;
             if(flag == true){
                 for(int i= 0; i<transMatrix.length; i++){
-                    double[] temp = rank_sp;
                     for(int j=0; j<transMatrix[0].length; j++){
                         rank_sp[i]+= alpha*transMatrix[i][j]*rank_sp[j];
                     }
                     rank_sp[i]+= (1-alpha)*e[i];
-                    for(int k=0; k<rank_sp.length; k++){
-                        if(judge(temp,rank_sp,minErrors)){
-                            flag = false;
-                        }
-                    }
+                }
+                if(judge(temp,rank_sp,minErrors)){
+                    flag = false;
                 }
             }else
                 break;
