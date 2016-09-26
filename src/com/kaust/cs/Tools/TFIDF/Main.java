@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         Vector<Paper> vec = new Vector<Paper>();
-        Map<String, HashMap<String, Integer>> normal = ReadFiles.NormalTFOfAll(vec);
+        Map<String, HashMap<String, Integer>> normal = ContentsParsing.NormalTFOfAll(vec);
         for (String filename : normal.keySet()) {
             System.out.println("fileName " + filename);
             System.out.println("TF " + normal.get(filename).toString());
@@ -23,7 +23,7 @@ public class Main {
 
         System.out.println("-----------------------------------------");
 
-        Map<String, HashMap<String, Float>> notNarmal = ReadFiles.tfOfAll(vec);
+        Map<String, HashMap<String, Float>> notNarmal = ContentsParsing.tfOfAll(vec);
         for (String filename : notNarmal.keySet()) {
             System.out.println("fileName " + filename);
             System.out.println("TF " + notNarmal.get(filename).toString());
@@ -31,14 +31,14 @@ public class Main {
 
         System.out.println("-----------------------------------------");
 
-        Map<String, Float> idf = ReadFiles.idf(vec);
+        Map<String, Float> idf = ContentsParsing.idf(vec);
         for (String word : idf.keySet()) {
             System.out.println("keyword :" + word + " idf: " + idf.get(word));
         }
 
         System.out.println("-----------------------------------------");
 
-        Map<String, HashMap<String, Float>> tfidf = ReadFiles.tfidf(vec);
+        Map<String, HashMap<String, Float>> tfidf = ContentsParsing.tfidf(vec);
         for (String filename : tfidf.keySet()) {
             System.out.println("fileName " + filename);
             System.out.println(tfidf.get(filename));

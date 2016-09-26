@@ -13,7 +13,7 @@ import com.kaust.cs.Tools.Weight;
  */
 public class AuthorNet {
     public static final int FREQUENCY = 4;
-    String file = "/Users/yangq0a/Documents/DBLPData/dblp.txt";
+    public static String file = "/Users/yangq0a/Documents/DBLPData/dblp.txt";
     String outPutPath = "./Data/authorResults.txt";
     Vector<Paper> v = new DataImport().dataImport(file);
     HashMap<String, ArrayList<String>> author = new HashMap<String, ArrayList<String>>();
