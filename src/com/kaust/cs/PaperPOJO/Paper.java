@@ -71,4 +71,8 @@ public class Paper {
     public void setReferenceList(LinkedList referenceList) {
         this.referenceList = referenceList;
     }
+
+    public String getTitleByID(String paperID){
+        return getPaperTitle();
+    }
 }

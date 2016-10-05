@@ -104,7 +104,10 @@ public class ContentsParsing {
         for (Paper p : vec) {
             HashMap<String, Float> dict = new HashMap<String, Float>();
             dict = ContentsParsing.tf(ContentsParsing.cutWord(p));
-            allTheTf.put(p.getPaperID(), dict);
+            allTheTf.put(p.getTitleByID(p.getPaperID()), dict);
+//            if(p.getPaperID().equals("53e99f94b7602d970286c0a9")){
+//                System.out.print("ssss"+p.getPaperTitle());
+//            }
         }
         return allTheTf;
     }
