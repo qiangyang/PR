@@ -6,25 +6,24 @@ import com.kaust.cs.Tools.ImprovedGraphModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 /**
 /**
  * Created by yangq0a on 16/9/11.
  */
-public class RandomWalk {
+public class ImprovedRandomWalk {
     public static final long MAX_ITERATIOM_TIMES = 1000;
     public static final double MIN_ERRORS = 0.0001;
     public static final float alpha = 0.8f;
     ReferenceNet rn = new ReferenceNet();
-    HashMap<Long, GraphModel> oringalClusters = rn.createReferenceNetwork();
+    HashMap<Long, ImprovedGraphModel> improveOringalClusters = rn.constructEdgeReinforcedCN();
 
-    public HashMap<Long, double[][]> getTransMatrix(){
+    public HashMap<Long, double[][]> getImprovedTransMatrix(){
         HashMap<Long, double[][]> transMatrix = new HashMap<Long, double[][]>();
-        for(long id: oringalClusters.keySet()){
-            GraphModel gm = oringalClusters.get(id);
+        for(long id: improveOringalClusters.keySet()){
+            ImprovedGraphModel gm = improveOringalClusters.get(id);
 //            GraphModel newGM = new GraphModel(gm.getNumOfVertice());
-            ArrayList<Integer> sumList = gm.getSumOfCol();
+            ArrayList<Double> sumList = gm.getSumOfCol();
 //            System.out.println("sum:"+ sumList);
             double edges[][] = new double[sumList.size()][sumList.size()];
             for(int i=0; i< gm.getEdges().length; i++){
@@ -48,10 +47,10 @@ public class RandomWalk {
         return transMatrix;
     }
     //for every node from every grahph compute their rank scores
-    public void RWRGraph(){
-        HashMap<Long, double[][]> transMatrix = getTransMatrix();
+    public void improvedRWRGraph(){
+        HashMap<Long, double[][]> transMatrix = getImprovedTransMatrix();
         for(long id: transMatrix.keySet()){
-            GraphModel gm = oringalClusters.get(id);
+            ImprovedGraphModel gm = improveOringalClusters.get(id);
             ArrayList<String> vertices = gm.getValueOfVertice();
             for(int i=0; i<vertices.size(); i++){
                 System.out.println("ID为"+id+"的referenceNet中"+"节点"+vertices.get(i)+"的ranking scroe为:");
@@ -110,8 +109,8 @@ public class RandomWalk {
         return flag;
     }
     public static void main(String[] args){
-        RandomWalk rw = new RandomWalk();
-        rw.RWRGraph();
+        ImprovedRandomWalk rw = new ImprovedRandomWalk();
+        rw.improvedRWRGraph();
     }
 }
 

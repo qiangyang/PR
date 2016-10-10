@@ -33,7 +33,7 @@ public class ContentsTopicDis {
 
     public double simByContents(String title)throws Exception{
         double sim = 0;
-        Map<String, HashMap<String, Float>> tfidf = getKeyInfoByTitle();
+        //Map<String, HashMap<String, Float>> tfidf = getKeyInfoByTitle();
         for(Paper p: v){
             sim  = SimFunction.simByJaccard(title, p.getPaperTitle());
             if(sim > 0.2) {

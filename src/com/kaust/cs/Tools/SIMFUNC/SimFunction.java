@@ -14,7 +14,7 @@ public class SimFunction {
     public static ArrayList<String> cutWord(String s) throws IOException {
         String[] cutWordResult = null;
         ArrayList<String> cutWordResults = new ArrayList<>();
-        cutWordResult = s.split(" |:|\\.");
+        cutWordResult = s.split(" |:|\\.|//?|//(|//)");
         ArrayList<String> stopWords = ContentsParsing.getStopWrods(stopFileName);
         for(String word: cutWordResult){
             if(stopWords.contains(word) || stopWords.contains(word.toLowerCase())){

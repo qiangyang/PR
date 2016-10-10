@@ -5,6 +5,7 @@ import com.kaust.cs.PaperPOJO.Paper;
 import java.util.Map;
 import java.util.Map.Entry;
 import com.kaust.cs.Tools.GraphModel;
+import com.kaust.cs.Tools.SIMFUNC.SimFunction;
 import com.kaust.cs.Tools.TimeCost;
 import com.kaust.cs.Tools.Weight;
 
@@ -227,7 +228,7 @@ public class AuthorNet {
         return authorRelMap;
     }
 
-    public void createAuthorNet(){
+    public HashMap<Long, ArrayList<AuthorRelationPairs>> createAuthorNet(){
         HashMap<Long, ArrayList<AuthorRelationPairs>> tempClusters = findCooperationBetAuthor();
         HashMap<Long, GraphModel> clusters = new HashMap<Long, GraphModel>();
         for(long id: tempClusters.keySet()){
@@ -269,7 +270,7 @@ public class AuthorNet {
             clusters.put(id, g);
         }
         System.out.println("The size of clusters is: "+clusters.size());
-
+        return tempClusters;
     }
 
     /**
@@ -278,10 +279,47 @@ public class AuthorNet {
     public void buildAdjGraphic(GraphModel g, String[] vertices, int n,Weight[] weight,int e) throws Exception{
         Weight.createAdjGraphic(g, vertices, n, weight, e);
     }
-    public static void main(String[] args){
+    /**
+     * 利用co-author构建索引
+     * */
+    public double constrcutIndexByCoauthor()throws IOException{
+        double sim = 0;
+        HashMap<Long, ArrayList<AuthorRelationPairs>> clusters = createAuthorNet();
+        for(Long id: clusters.keySet()){
+            ArrayList<AuthorRelationPairs> list = clusters.get(id);
+            HashMap<String, Integer> wordcount = new HashMap<>();
+            for(AuthorRelationPairs arp: list){
+                ArrayList<String> pidlist = arp.getCoPaperIDList();
+                for(String pid: pidlist){
+                    for(Paper p: v){
+                        if(p.getPaperID().equals(pid)){
+                            String pTitle = p.getPaperTitle();
+                            ArrayList<String> words = SimFunction.cutWord(pTitle);
+                            for(String word: words) {
+                                //System.out.println("word: "+word);
+                                if(word != null){
+                                    if (wordcount.containsKey(word)) {
+                                        int num = wordcount.get(word);
+                                        wordcount.put(word, ++num);
+                                    } else {
+                                        wordcount.put(word, 1);
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            System.out.println(wordcount);
+        }
+        return sim;
+    }
+    public static void main(String[] args)throws IOException{
         AuthorNet an = new AuthorNet();
         long startTime = TimeCost.getTime();
-        an.createAuthorNet();
+        //an.createAuthorNet();
+        an.constrcutIndexByCoauthor();
         long endTime = TimeCost.getTime();
         System.out.println("The time of builing authorNet is :"+TimeCost.getTimeCost(startTime, endTime)+" ms");
 //        Vector<Paper> vec = new Vector<Paper>();

@@ -31,6 +31,7 @@ public class VenueFactor {
         HashMap<String, Integer> venues = getVenues();
         for(String venueName: venues.keySet()){
             int citationTimes = 0;
+            int occuringTimes = venues.get(venueName);
             for(Paper p: v){
                 if(p.getVenue()!=null) {
                     if (p.getVenue().equals(venueName)) {
@@ -43,8 +44,8 @@ public class VenueFactor {
                     }
                 }
             }
-            double impactFactor = citationTimes*venues.get(venueName)*1.0/(v.size()*venues.size());
-            //double impactFactor = citationTimes*1.0/v.size();
+            //double impactFactor = citationTimes*venues.get(venueName)*1.0/(v.size()*venues.size());
+            double impactFactor = citationTimes*1.0/occuringTimes;
             venueImpactFacor.put(venueName, impactFactor);
         }
         System.out.println(venueImpactFacor);
